@@ -35,6 +35,7 @@ def get_page_data(url):
     time.sleep(5)
 
     driver.get(url=url)
+
     time.sleep(5)
 
     html = driver.page_source
@@ -103,14 +104,15 @@ def get_page_data(url):
 
 
 
-def main():
-    link = 'https://domclick.ru/pokupka/kvartiry/odnokomnatnaja?page=2'
-    page = 3
+def main(ade, pages):
+    link = str(ade)
+    page = int(pages)
     text = re.sub(r'page=\d+', 'page={}', link)
-    urls = [text.format(str(i)) for i in range(1, 3)]
+    urls = [text.format(str(i)) for i in range(1, page)]
 
     with Pool(3) as p:
         p.map(get_page_data, urls)
+
 
 
 

@@ -3,6 +3,7 @@ from telebot import types
 import Cian_2
 from time import sleep, strftime
 from time import strftime
+import DomClik
 import DomoFond
 
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
@@ -11,8 +12,9 @@ bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 def start(message):
     start_button = types.KeyboardButton(text='Циан')
     start_button_2 = types.KeyboardButton(text='DomoFond')
+    start_button_3 = types.KeyboardButton(text='DomClick')
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(start_button, start_button_2)
+    keyboard.add(start_button, start_button_2, start_button_3)
     sent = bot.send_message(message.chat.id, 'Добро пожаловать', reply_markup=keyboard)
     bot.register_next_step_handler(sent, callback_worker)
 
@@ -26,6 +28,10 @@ def callback_worker(message):
         qe = bot.send_message(message.chat.id, 'Введите ссылку DomoFond')
         if qe:
             bot.register_next_step_handler(qe, callback_workers_DomoFond)
+    elif message.text == 'DomClick':
+        qe = bot.send_message(message.chat.id, 'Введите ссылку DomClick')
+        if qe:
+            bot.register_next_step_handler(qe, callback_workers_DomClick)
     else:
         bot.send_message(message.chat.id, 'Что то пошло не так', )
 
@@ -67,6 +73,26 @@ def callback__two_DomoFond(message):
     DomoFond.main(ade=lists_DomoFond[0], pages=lists_DomoFond[1])
     timestr = strftime("%Y.%m.%d-%H.%M")
     doc = open(timestr + '_Domofond' + '.csv', 'rb')
+    bot.send_document(message.chat.id, doc)
+"""_________________________DomClick_______________________________"""
+
+lists_DomClick = []
+@bot.message_handler(content_types=['text'])
+def callback_workers_DomClick(message):
+        f = message.text
+        print(f)
+        lists_DomClick.append(f)
+        qqq = bot.send_message(message.chat.id, 'Введите номер страницы Домклик')
+        bot.register_next_step_handler(qqq, callback__two_DomClick)
+
+
+def callback__two_DomClick(message):
+    page = message.text
+    print(page)
+    lists_DomClick.append(page)
+    DomClik.main(ade=lists_DomClick[0], pages=lists_DomClick[1])
+    timestr = strftime("%Y.%m.%d-%H.%M")
+    doc = open(timestr + '_DomClick' + '.csv', 'rb')
     bot.send_document(message.chat.id, doc)
 
 if __name__ == '__main__':
