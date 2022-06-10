@@ -104,8 +104,14 @@ def get_page_data(url):
 
 
 def main():
-    link = 'https://domclick.ru/pokupka/kvartiry/odnokomnatnaja'
-    get_page_data(link)
+    link = 'https://domclick.ru/pokupka/kvartiry/odnokomnatnaja?page=2'
+    page = 3
+    text = re.sub(r'page=\d+', 'page={}', link)
+    urls = [text.format(str(i)) for i in range(1, 3)]
+
+    with Pool(3) as p:
+        p.map(get_page_data, urls)
+
 
 
 if __name__ == '__main__':
