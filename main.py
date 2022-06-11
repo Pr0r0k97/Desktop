@@ -1,13 +1,14 @@
 import telebot
 from telebot import types
 import Cian_2
-from time import sleep, strftime
 from time import strftime
 import DomClik
 import DomoFond
 import re
 
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
+global list_name
+list_name = []
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -16,8 +17,11 @@ def start(message):
     start_button_3 = types.KeyboardButton(text='DomClick')
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(start_button, start_button_2, start_button_3)
-    sent = bot.send_message(message.chat.id, 'Добро пожаловать', reply_markup=keyboard)
+    user_first_name = str(message.chat.first_name)
+    list_name.append(user_first_name)
+    sent = bot.send_message(message.chat.id, f'Добро пожаловать {user_first_name}',  reply_markup=keyboard)
     bot.register_next_step_handler(sent, callback_worker)
+
 
 
 def callback_worker(message):
@@ -54,10 +58,11 @@ def callback__two(message):
     page = message.text
     if re.search('\d+', page):
         lists.append(page)
+        user_first_name = str(message.chat.first_name)
         Cian_2.main(ade=lists[0], pages=lists[1])
-        timestr = strftime("%Y.%m.%d-%H.%M")
-        doc = open(timestr + '_cian' + '.csv', 'rb')
-        bot.send_document(message.chat.id, doc)
+        # timestr = strftime("%Y.%m.%d-%H.%M")
+        # doc = open(timestr + '_cian' + '.csv', 'rb')
+        # bot.send_document(message.chat.id, doc)
     else:
         bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
 
@@ -65,7 +70,6 @@ def callback__two(message):
 """_________________________Domofond_______________________________"""
 
 lists_DomoFond = []
-
 def callback_workers_DomoFond(message):
         f = message.text
         if 'https://www.domofond.ru' in f:
@@ -124,6 +128,8 @@ def callback__two_DomClick(message):
 def callback__two_Start(message):
     bot.send_message(message.chat.id, 'Нажмите старт заново')
     start
+
+
 
 
 if __name__ == '__main__':

@@ -1,11 +1,10 @@
-import time
 import requests
 from bs4 import BeautifulSoup
 import csv
-from multiprocessing import Pool
-import json
+from multiprocessing import Pool, Process
 import re
 import time
+import main
 
 headers = {
      "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
@@ -40,15 +39,11 @@ def write_csv(data):
     with open(timestr + '_cian' + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow((data['kom'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['url'], data['data_time']))
-        # qwe = str(f).split("'")[1]
-        # telebot_one.test(message=qwe)
-    # with open('data.json', 'a', encoding='utf-8') as outfile:
-    #         json.dump(data, outfile, indent=4, ensure_ascii=False)
-
 
 
 # Ищем данные
 def get_page_data(html):
+
     soup = BeautifulSoup(html, 'lxml')
     ads = soup.find('div', class_='_93444fe79c--wrapper--W0WqH').find_all('article', class_='_93444fe79c--container--Povoi')
 
@@ -113,10 +108,12 @@ def get_page_data(html):
         write_csv(data)
 
 
-
 def make_all(url):
     html = get_html(url)
     get_page_data(html)
+
+
+
 
 def main(ade, pages):
     urlst = str(ade)
@@ -124,9 +121,11 @@ def main(ade, pages):
     text = re.sub(r'p=\d', 'p={}', urlst)
     urls = [text.format(str(i)) for i in range(1, page)]
 
+
     #Подключаем мультипроцессинг
-    with Pool(10) as p:
-        p.map(make_all, urls)
+    # with Pool(10) as p:
+    #     p.map(make_all, urls)
+
 
 
 if __name__ == '__main__':

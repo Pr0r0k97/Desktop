@@ -1,4 +1,3 @@
-from selenium import webdriver
 from time import sleep, strftime
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup as BS
@@ -6,18 +5,18 @@ from multiprocessing import Pool
 import re
 import csv
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import os
 import time
+import main
 
 
+# #Сохранение в csv фаил
+# def write_csv(data):
 
-# Сохранение в csv фаил
-def write_csv(data):
-    timestr = strftime("%Y.%m.%d")
-    with open(timestr + '_DomClick' + '.csv', 'a', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow((data['name'], data['numbers'], data['price'], data['views'], data['data_dobavlenia'], data['metro'], data['addres'], data['kvdrat_metr'], data['name_user']))
+    # timestr = strftime("%Y.%m.%d")
+    # with open(timestr + '_DomClick' + '.csv', 'a', encoding='utf-8') as f:
+    #     writer = csv.writer(f)
+    #     writer.writerow((data['name'], data['numbers'], data['price'], data['views'], data['data_dobavlenia'], data['metro'], data['addres'], data['kvdrat_metr'], data['name_user']))
 
 
 def get_page_data(url):
