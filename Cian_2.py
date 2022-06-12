@@ -36,7 +36,6 @@ def retrys(func, retries=5):
 # Делаем запрос к странице
 @retrys
 def get_html(url, retry=5):
-    time.sleep(5)
     try:
         r = requests.get(url, headers=headers)
         print(f"[+]  {url} {r.status_code}")
@@ -52,9 +51,9 @@ def get_html(url, retry=5):
 
 
 # Сохранение в csv фаил
-def write_csv(data):
+def write_csv(data, user):
     timestr = time.strftime("%Y.%m.%d")
-    with open(timestr + '_cians' + '.csv', 'a', encoding='utf-8') as f:
+    with open(timestr + '_cians_' + user + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow((data['name'], data['urls_info_block'],  data['url'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user']))
 
@@ -62,7 +61,8 @@ def write_csv(data):
 
 
 # Ищем данные
-def get_page_data(html):
+def get_page_data(html, user):
+
     url_list = []
     soup = BeautifulSoup(html, 'lxml')
     ads = soup.find('div', class_='_93444fe79c--wrapper--W0WqH').find_all('article', class_='_93444fe79c--container--Povoi')
@@ -146,16 +146,17 @@ def get_page_data(html):
                 'id_user': id_user
                 }
         print(data)
-        write_csv(data)
+        write_csv(data, user)
 
 def end_func(response):
     print("Задание завершено")
 
 
 def make_all(url, user):
-    print(user)
-    html = get_html(url)
-    get_page_data(html)
+    for i in url:
+        html = get_html(i)
+    print(i)
+    get_page_data(html, user)
 
 
 def main(ade, pages, user):
@@ -166,11 +167,9 @@ def main(ade, pages, user):
 
     # Подключаем мультипроцессинг
     with Pool(4) as p:
-        p.apply(make_all, args=(urls, user))
-
-
-
-
+        p.apply_async(make_all, args=(urls, user), callback=end_func)
+        p.close()
+        p.join()
 
 if __name__ == '__main__':
     main()

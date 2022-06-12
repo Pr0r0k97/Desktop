@@ -11,18 +11,18 @@ import os
 from multiprocessing import Pool
 import re
 import csv
-
+import time
 
 
 # Сохранение в csv фаил
-def write_csv(data):
+def write_csv(data, user):
     timestr = strftime("%Y.%m.%d")
-    with open(timestr + '_Domofond' + '.csv', 'a', encoding='utf-8') as f:
+    with open(timestr + '_Domofond_' + user + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'], data['metro'], data['numbers']))
 
 
-def get_page_data(url):
+def get_page_data(url, user):
     options = webdriver.FirefoxOptions()
     # options.add_argument('--headless')
     p = os.path.abspath('geckodriver.exe')
@@ -92,23 +92,19 @@ def get_page_data(url):
 
 
 
+def end_func(response):
+    print("Задание завершено")
 
-def main(ade, pages):
+
+def main(ade, pages, user):
     link = str(ade)
     page = int(pages)
     text = re.sub(r'Page=\d+', 'Page={}', link)
     urls = [text.format(str(i)) for i in range(1, page)]
-
     with Pool(3) as p:
-        p.map(get_page_data, urls)
-    #for url in urls:
-
-        #driver.execute_script("window.open('" + url +"');")
-
-        #driver.get(url)
-        #driver.switch_to_window()
-
-    #driver.switch_to.window(driver.window_handles[2])
+        p.apply_async(get_page_data, args=(urls, user), callback=end_func)
+        p.close()
+        p.join()
 
 
 
