@@ -59,7 +59,7 @@ def callback__two(message):
     if re.search('\d+', page):
         lists.append(page)
         user_first_name = str(message.chat.first_name)
-        Cian_2.main(ade=lists[0], pages=lists[1])
+        Cian_2.main(ade=lists[0], pages=lists[1], user=user_first_name)
         # timestr = strftime("%Y.%m.%d-%H.%M")
         # doc = open(timestr + '_cian' + '.csv', 'rb')
         # bot.send_document(message.chat.id, doc)

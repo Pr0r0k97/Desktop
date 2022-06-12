@@ -1,27 +1,45 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-from multiprocessing import Pool, Process
+from multiprocessing import Pool
 import re
 import time
-import main
+from fake_useragent import UserAgent
+
+ua = UserAgent()
 
 headers = {
-     "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
+     "User-Agent": ua.firefox,
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
       "Accept-Language": "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
       "Accept-Encoding": "gzip, deflate, br",
       "DNT": "1",
       "Connection": "keep-alive",
-       "Cookie": "_CIAN_GK=7eb49d76-5a7e-49ec-b1f1-44097923c292; session_region_id=1; session_main_town_region_id=1; adb=1; sopr_utm=%7B%22utm_source%22%3A+%22kwork.ru%22%2C+%22utm_medium%22%3A+%22referral%22%7D; uxfb_usertype=searcher; uxs_uid=a24c5860-dba2-11ec-9511-6db685ddd7d2; serp_registration_trigger_popup=1; cookie_agreement_accepted=1; __cf_bm=sW4gQgPi6ZMFwEiD8DiUMRTdmNwfXHN_C0T3j0TO9pA-1653499426-0-AWkaQDF7t3uSzqfGg66fRcmmpecnwp0AoExDwUxdC+ISa1RYc4CpNelo2QJDKiaUkfVuNMS/Vmk1Ii7M5DGis1k=; _gcl_au=1.1.270258717.1653495045; sopr_session=95746daceb5a4e9f"
-         }
+       "Cookie": "_CIAN_GK=ca14318e-34ad-4246-b520-8cd5feae6cac; session_region_id=1; session_main_town_region_id=1; adb=1; sopr_utm=%7B%22utm_source%22%3A+%22kwork.ru%22%2C+%22utm_medium%22%3A+%22referral%22%7D; _gcl_au=1.1.243468318.1654361935; uxfb_usertype=searcher; uxs_uid=9eae8e20-e427-11ec-914c-d7ad1976a7c3; serp_registration_trigger_popup=1; distance_calculating_onboarding_counter=3; __cf_bm=_ESf.3LOr5dtzmSsKTf5GuWF1LXewVMwRyAaDHrCpOU-1654371461-0-AV5TeQuyg+bIjiCJn3h7S/CO19oVgI9udM8WiBDHrXA4w2VMNiNpwRHZWYxIy2Hrf2uPGc+jWuRvEVKNEovFjS8=; sopr_session=66ebbc8b599f4364"
+}
+
+
+def retrys(func, retries=5):
+    def retry_wrapper(*args, **kwargs):
+        attempts = 0
+        while attempts < retries:
+            try:
+                return func(*args, **kwargs)
+            except requests.exceptions.RequestException as e:
+                print("Пытаюсь восстановить подключение!")
+                time.sleep(10)
+                attempts += 1
+
+    return retry_wrapper
+
 
 # Делаем запрос к странице
+@retrys
 def get_html(url, retry=5):
     time.sleep(5)
     try:
         r = requests.get(url, headers=headers)
-        print(f"[+] {url} {r.status_code}")
+        print(f"[+]  {url} {r.status_code}")
     except Exception as ex:
         time.sleep(5)
         if retry:
@@ -35,45 +53,49 @@ def get_html(url, retry=5):
 
 # Сохранение в csv фаил
 def write_csv(data):
-    timestr = time.strftime("%Y.%m.%d-%H.%M")
-    with open(timestr + '_cian' + '.csv', 'a', encoding='utf-8') as f:
+    timestr = time.strftime("%Y.%m.%d")
+    with open(timestr + '_cians' + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow((data['kom'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['url'], data['data_time']))
+        writer.writerow((data['name'], data['urls_info_block'],  data['url'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user']))
+
+
 
 
 # Ищем данные
 def get_page_data(html):
-
+    url_list = []
     soup = BeautifulSoup(html, 'lxml')
     ads = soup.find('div', class_='_93444fe79c--wrapper--W0WqH').find_all('article', class_='_93444fe79c--container--Povoi')
 
     for ad in ads:
-        # try:
-        #     title = ad.find('div', class_='_93444fe79c--subtitle--vHiOV').text
-        # except:
-        #     title = ''
         try:
+
             try:
-                kom = ad.find('span', class_='_93444fe79c--color_primary_100--mNATk').text
+                kom = ad.find('div', class_='_93444fe79c--subtitle--vHiOV').text.split()[0]
             except:
                 kom = ''
             try:
-                data_time = ad.find('div', class_='_93444fe79c--absolute--yut0v').text
+                id_user = ad.find('span', class_='_93444fe79c--color_current_color--gpi6p').text
             except:
-                data_time = ''
+                id_user = ''
+            try:
+                kvadrat_metr = ad.find('div', class_='_93444fe79c--subtitle--vHiOV').text.split(' ')[2]
+            except:
+                kvadrat_metr = ''
+            try:
+                etazh = ad.find('div', class_='_93444fe79c--subtitle--vHiOV').text.split(' ')[-2]
+            except:
+                etazh = ''
             try:
                 urls = ad.find('a', class_='_93444fe79c--link--eoxce').get('href')
-                #url_list.append(urls)
+                url_list.append(urls)
             except:
                 urls = ''
             try:
                 addres = ad.find('div', class_='_93444fe79c--labels--L8WyJ').text
             except:
                 addres = ''
-            try:
-                price = ad.find('span', class_='_93444fe79c--color_black_100--kPHhJ _93444fe79c--lineHeight_28px--whmWV _93444fe79c--fontWeight_bold--ePDnv _93444fe79c--fontSize_22px--viEqA _93444fe79c--display_block--pDAEx _93444fe79c--text--g9xAG _93444fe79c--text_letterSpacing__normal--xbqP6').text.strip()
-            except:
-                price = ''
+
             try:
                 metro = ad.find('a', class_='_93444fe79c--link--BwwJO').text
             except:
@@ -92,8 +114,24 @@ def get_page_data(html):
                 kvdrat = ''
         except Exception as ex:
             continue
+        for url in url_list:
+            r = requests.get(url=url, headers=headers)
+            try:
+                soup = BeautifulSoup(r.text, 'lxml')
+                urls_info_block = soup.find('div', class_='a10a3f92e9--print_phones--himoo').text
+                try:
+                    name = soup.find('h1', class_='a10a3f92e9--title--UEAG3').text
+                except:
+                    name = ''
+                try:
+                    price = soup.find('span', class_='a10a3f92e9--price_value--lqIK0').text
+                except:
+                    price = ''
+            except Exception as ex:
+                print("Что-то пошло не так")
 
         data = {
+                'name': name,
                 'url': urls,
                 'addres': addres,
                 'price': price,
@@ -102,31 +140,38 @@ def get_page_data(html):
                 'peshkom': peshkom,
                 'kvdrat': kvdrat,
                 'kom': kom,
-                'data_time': data_time
+                'kvadrat_metr': kvadrat_metr,
+                'etazh': etazh,
+                'urls_info_block': urls_info_block,
+                'id_user': id_user
                 }
-
+        print(data)
         write_csv(data)
 
+def end_func(response):
+    print("Задание завершено")
 
-def make_all(url):
+
+def make_all(url, user):
+    print(user)
     html = get_html(url)
     get_page_data(html)
 
 
-
-
-def main(ade, pages):
+def main(ade, pages, user):
     urlst = str(ade)
     page = int(pages)
-    text = re.sub(r'p=\d', 'p={}', urlst)
+    text = re.sub(r'p=\d+', 'p={}', urlst)
     urls = [text.format(str(i)) for i in range(1, page)]
 
+    # Подключаем мультипроцессинг
+    with Pool(4) as p:
+        p.apply(make_all, args=(urls, user))
 
-    #Подключаем мультипроцессинг
-    # with Pool(10) as p:
-    #     p.map(make_all, urls)
+
 
 
 
 if __name__ == '__main__':
     main()
+
