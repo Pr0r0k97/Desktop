@@ -117,7 +117,8 @@ def callback__two_DomClick(message):
     print(page)
     if re.search('\d+', page):
         lists_DomClick.append(page)
-        DomClik.main(ade=lists_DomClick[0], pages=lists_DomClick[1])
+        user_first_name = str(message.chat.first_name)
+        DomClik.Parsing_Domclick(ade=lists_DomClick[0], pages=lists_DomClick[1], user=user_first_name)
         timestr = strftime("%Y.%m.%d-%H.%M")
         doc = open(timestr + '_DomClick' + '.csv', 'rb')
         bot.send_document(message.chat.id, doc)
