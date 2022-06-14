@@ -6,6 +6,7 @@ import DomClik
 import DomoFond
 import re
 
+
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 global list_name
 list_name = []
@@ -86,7 +87,7 @@ def callback__two_DomoFond(message):
         if re.search('\d+', page):
             lists_DomoFond.append(page)
             user_first_name = str(message.chat.first_name)
-            DomoFond.main(ade=lists_DomoFond[0], pages=lists_DomoFond[1], user=user_first_name)
+            DomoFond.Parsing(ade=lists_DomoFond[0], pages=lists_DomoFond[1], user=user_first_name)
             timestr = strftime("%Y.%m.%d")
             doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
