@@ -6,7 +6,7 @@ import os
 from multiprocessing import Pool
 import re
 import csv
-import asyncio
+import main
 
 class Parsing():
 
@@ -15,7 +15,7 @@ class Parsing():
         self.page = int(pages)
         self.user = user
         text = re.sub(r'Page=\d+', 'Page={}', self.link)
-        urls = [text.format(str(i)) for i in range(1, self.page)]
+        urls = [text.format(str(i)) for i in range(self.page)]
         with Pool(5) as p:
             p.map_async(self.get_page_data, urls)
             p.close()
@@ -26,13 +26,13 @@ class Parsing():
         count = 0
         for i in url:
             count += 1
-        print(f'Выполняется парсинг {i} страницы из {self.page}')
+        print(f'Выполняется парсинг {i} страниц из {self.page}')
+        main.info_DomoFond(one=i, two=self.page)
         options = webdriver.FirefoxOptions()
         # options.add_argument('--headless')
         p = os.path.abspath('geckodriver.exe')
         driver = webdriver.Firefox(options=options, executable_path=p)
         driver.get(url=url)
-
         sleep(2)
         html = driver.page_source
         soup = BS(html, 'lxml')
