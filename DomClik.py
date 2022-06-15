@@ -7,7 +7,7 @@ import csv
 from selenium import webdriver
 import os
 import time
-
+import main
 
 class Parsing_Domclick():
     def __init__(self, ade, pages, user):
@@ -15,7 +15,7 @@ class Parsing_Domclick():
         self.page = int(pages)
         self.user = user
         text = re.sub(r'page=\d+', 'page={}', self.link)
-        urls = [text.format(str(i)) for i in range(1, self.page)]
+        urls = [text.format(str(i)) for i in range(self.page)]
 
         with Pool(3) as p:
             p.map(self.get_page_data, urls)
@@ -31,8 +31,10 @@ class Parsing_Domclick():
     def get_page_data(self, url):
         count = 0
         for i in url:
+            sleep(0.1)
             count += 1
-        print(f'Выполняется парсинг {i} страницы из {self.page}')
+        print(f'Выполняется парсинг {i} страниц из {self.page}')
+        main.info_DomClick(one=i, two=self.page)
         options = webdriver.ChromeOptions()
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)

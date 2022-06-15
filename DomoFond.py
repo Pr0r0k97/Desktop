@@ -16,7 +16,7 @@ class Parsing():
         self.user = user
         text = re.sub(r'Page=\d+', 'Page={}', self.link)
         urls = [text.format(str(i)) for i in range(self.page)]
-        with Pool(5) as p:
+        with Pool(3) as p:
             p.map_async(self.get_page_data, urls)
             p.close()
             p.join()
