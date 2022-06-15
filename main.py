@@ -5,11 +5,14 @@ from time import strftime
 import DomClik
 import DomoFond
 import re
-
+import logging
 
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
-global list_name
-list_name = []
+
+# Включаем логирование, чтобы не пропустить важные сообщения
+logging.basicConfig(level=logging.INFO)
+
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -19,7 +22,6 @@ def start(message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(start_button, start_button_2, start_button_3)
     user_first_name = str(message.chat.first_name)
-    list_name.append(user_first_name)
     sent = bot.send_message(message.chat.id, f'Добро пожаловать {user_first_name}',  reply_markup=keyboard)
     bot.register_next_step_handler(sent, callback_worker)
 
@@ -29,7 +31,7 @@ def callback_worker(message):
     if message.text == 'Циан':
         qs = bot.send_message(message.chat.id, 'Введите ссылку')
         if qs:
-            bot.register_next_step_handler(qs, callback_workers)
+             bot.register_next_step_handler(qs, callback_workers)
     elif message.text == 'DomoFond':
         qe = bot.send_message(message.chat.id, 'Введите ссылку DomoFond')
         if qe:
@@ -95,6 +97,10 @@ def callback__two_DomoFond(message):
             bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
 
 
+def info_DomoFond(message, one, two):
+    print(one)
+    print(two)
+    bot.send_message(message.chat.id, f'Выполняется парсинг {one} страницы из {two}')
 
 
 
@@ -119,7 +125,7 @@ def callback__two_DomClick(message):
         lists_DomClick.append(page)
         user_first_name = str(message.chat.first_name)
         DomClik.Parsing_Domclick(ade=lists_DomClick[0], pages=lists_DomClick[1], user=user_first_name)
-        timestr = strftime("%Y.%m.%d-%H.%M")
+        timestr = strftime("%Y.%m.%d")
         doc = open(timestr + '_DomClick' + '.csv', 'rb')
         bot.send_document(message.chat.id, doc)
     else:

@@ -29,6 +29,10 @@ class Parsing_Domclick():
 
 
     def get_page_data(self, url):
+        count = 0
+        for i in url:
+            count += 1
+        print(f'Выполняется парсинг {i} страницы из {self.page}')
         options = webdriver.ChromeOptions()
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)

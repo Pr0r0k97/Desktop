@@ -1,45 +1,38 @@
 from selenium import webdriver
 from time import sleep, strftime
-from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.firefox.options import  Options as  FirefoxOptions
 from bs4 import BeautifulSoup as BS
 import os
 from multiprocessing import Pool
 import re
 import csv
-import time
+import asyncio
 
 class Parsing():
+
     def __init__(self, ade, pages, user):
         self.link = str(ade)
         self.page = int(pages)
         self.user = user
         text = re.sub(r'Page=\d+', 'Page={}', self.link)
         urls = [text.format(str(i)) for i in range(1, self.page)]
-
-        with Pool(3) as p:
+        with Pool(5) as p:
             p.map_async(self.get_page_data, urls)
             p.close()
             p.join()
 
-    # Сохранение в csv фаил
-    def write_csv(self, data):
-        timestr = strftime("%Y.%m.%d")
-        with open(timestr + '_Domofond_' + self.user + '.csv', 'a', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'],
-                             data['metro'], data['numbers']))
 
     def get_page_data(self, url):
+        count = 0
+        for i in url:
+            count += 1
+        print(f'Выполняется парсинг {i} страницы из {self.page}')
         options = webdriver.FirefoxOptions()
         # options.add_argument('--headless')
         p = os.path.abspath('geckodriver.exe')
         driver = webdriver.Firefox(options=options, executable_path=p)
         driver.get(url=url)
+
         sleep(2)
         html = driver.page_source
         soup = BS(html, 'lxml')
@@ -47,8 +40,7 @@ class Parsing():
             dates = soup.find('span', class_='long-item-card__listDate___1AWok').text
         except:
             dates = ''
-        ads = soup.find('div', class_='search-results__itemCardList___RdWje').find_all('a',
-                                                                                       class_='long-item-card__item___ubItG')
+        ads = soup.find('div', class_='search-results__itemCardList___RdWje').find_all('a', class_='long-item-card__item___ubItG')
         for ad in ads:
             urls = 'https://www.domofond.ru' + ad.get('href')
             driver.get(urls)
@@ -96,11 +88,17 @@ class Parsing():
                 'hous_kompleks': hous_kompleks,
                 'addres': addres,
                 'metro': metro,
-                'numbers': numbers,
-
+                'numbers': numbers
             }
             print(data)
             self.write_csv(data)
+
+        # Сохранение в csv фаил
+    def write_csv(self, data):
+        timestr = strftime("%Y.%m.%d")
+        with open(timestr + '_Domofond_' + self.user + '.csv', 'w', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'], data['metro'], data['numbers']))
 
     def end_func(self, response):
         print("Задание завершено")
