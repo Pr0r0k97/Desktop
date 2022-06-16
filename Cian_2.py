@@ -57,20 +57,18 @@ def get_html(url, retry=5):
 # Сохранение в csv фаил
 def write_csv(data, user):
     timestr = time.strftime("%Y.%m.%d")
-    with open(timestr + '_cians_' + user + '.csv', 'w', encoding='utf-8') as f:
+    with open(timestr + '_cians_' + user + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow((data['name'], data['urls_info_block'],  data['url'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user']))
+        writer.writerow((data['name'], data['urls_info_block'], data['views'], data['data_dobavlenia'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user'], data['url']))
 
 
 
 
 # Ищем данные
 def get_page_data(html, user):
-
     url_list = []
     soup = BeautifulSoup(html, 'lxml')
     ads = soup.find('div', class_='_93444fe79c--wrapper--W0WqH').find_all('article', class_='_93444fe79c--container--Povoi')
-
     for ad in ads:
         try:
 
@@ -116,6 +114,7 @@ def get_page_data(html, user):
                 kvdrat = ad.find('p', class_='_93444fe79c--color_gray60_100--MlpSF _93444fe79c--lineHeight_20px--tUURJ _93444fe79c--fontWeight_normal--P9Ylg _93444fe79c--fontSize_14px--TCfeJ _93444fe79c--display_block--pDAEx _93444fe79c--text--g9xAG _93444fe79c--text_letterSpacing__normal--xbqP6').text
             except:
                 kvdrat = ''
+
         except Exception as ex:
             continue
         for url in url_list:
@@ -131,6 +130,14 @@ def get_page_data(html, user):
                     price = soup.find('span', class_='a10a3f92e9--price_value--lqIK0').text
                 except:
                     price = ''
+                try:
+                    views = soup.find('a', class_='a10a3f92e9--link--ulbh5').text
+                except:
+                    views = ''
+                try:
+                    data_dobavlenia = soup.find('div', class_='a10a3f92e9--container--DUOig').text
+                except:
+                    data_dobavlenia = ''
             except Exception as ex:
                 print("Что-то пошло не так")
 
@@ -147,6 +154,8 @@ def get_page_data(html, user):
                 'kvadrat_metr': kvadrat_metr,
                 'etazh': etazh,
                 'urls_info_block': urls_info_block,
+                'views': views,
+                'data_dobavlenia': data_dobavlenia,
                 'id_user': id_user
                 }
         print(data)

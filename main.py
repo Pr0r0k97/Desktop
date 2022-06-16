@@ -8,6 +8,8 @@ import re
 import logging
 import time
 import tg_analytic
+import os
+
 
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 
@@ -16,9 +18,6 @@ bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 # Logger
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
-
-
-
 
 
 @bot.message_handler(commands=['start'])
@@ -83,6 +82,10 @@ def callback__two(message):
             timestr = strftime("%Y.%m.%d")
             doc = open(timestr + '_cians_' + user_first_name + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
+            time.sleep(5)
+            p = os.path.abspath(timestr + '_cians_' + user_first_name + '.csv')
+            os.remove(p + timestr + '_cians_' + user_first_name + '.csv')
+
         else:
             bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
