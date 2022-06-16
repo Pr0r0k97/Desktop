@@ -23,17 +23,17 @@ class Parsing_Domclick():
     # #Сохранение в csv фаил
     def write_csv(self, data):
         timestr = strftime("%Y.%m.%d")
-        with open(timestr + '_DomClick_' + self.user + '.csv', 'a', encoding='utf-8') as f:
+        with open(timestr + '_DomClick_' + self.user + '.csv', 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow((data['name'], data['numbers'], data['price'], data['views'], data['data_dobavlenia'], data['metro'], data['addres'], data['kvdrat_metr'], data['name_user']))
 
 
     def get_page_data(self, url):
-        count = 0
+        count = 1
         for i in url:
             sleep(0.1)
             count += 1
-        print(f'Выполняется парсинг {i} страниц из {self.page}')
+        print(f'Выполняется парсинг {count} страниц из {self.page}')
         main.info_DomClick(one=i, two=self.page)
         options = webdriver.ChromeOptions()
         options.add_experimental_option("excludeSwitches", ["enable-automation"])

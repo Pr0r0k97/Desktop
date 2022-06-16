@@ -1,3 +1,4 @@
+import pandas as pd
 from selenium import webdriver
 from time import sleep, strftime
 from selenium.webdriver.common.by import By
@@ -7,15 +8,16 @@ from multiprocessing import Pool
 import re
 import csv
 import main
-
+import openpyxl as xl
+from openpyxl import Workbook
+import pandas
 class Parsing():
-
     def __init__(self, ade, pages, user):
         self.link = str(ade)
         self.page = int(pages)
         self.user = user
         text = re.sub(r'Page=\d+', 'Page={}', self.link)
-        urls = [text.format(str(i)) for i in range(self.page)]
+        urls = [text.format(str(i)) for i in range(1, self.page)]
         with Pool(3) as p:
             p.map_async(self.get_page_data, urls)
             p.close()
@@ -90,15 +92,27 @@ class Parsing():
                 'metro': metro,
                 'numbers': numbers
             }
+            # data = pd.DataFrame({
+            #     'dates': [dates],
+            #     'name': [name],
+            #     'price': [price],
+            #     'hous_kompleks': [hous_kompleks],
+            #     'addres': [addres],
+            #     'metro': [metro],
+            #     'numbers': [numbers]
+            #
+            # })
             print(data)
             self.write_csv(data)
 
         # Сохранение в csv фаил
     def write_csv(self, data):
         timestr = strftime("%Y.%m.%d")
-        with open(timestr + '_Domofond_' + self.user + '.csv', 'w', encoding='utf-8') as f:
+        with open(timestr + '_Domofond_' + self.user + '.xlsx', 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'], data['metro'], data['numbers']))
+        #Edata.to_excel(timestr + '_DomoFond.xlsx', 'w')
+
 
     def end_func(self, response):
         print("Задание завершено")

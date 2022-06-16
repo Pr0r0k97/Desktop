@@ -38,7 +38,11 @@ def retrys(func, retries=5):
 def get_html(url, retry=5):
     try:
         r = requests.get(url, headers=headers)
-        print(f"[+]  {url} {r.status_code}")
+        #print(f"[+]  {url} {r.status_code}")
+        count = 0
+        for i in url:
+            count += 1
+        print(f'Выполняется парсинг данной страницы {url}')
     except Exception as ex:
         time.sleep(5)
         if retry:
@@ -53,7 +57,7 @@ def get_html(url, retry=5):
 # Сохранение в csv фаил
 def write_csv(data, user):
     timestr = time.strftime("%Y.%m.%d")
-    with open(timestr + '_cians_' + user + '.csv', 'a', encoding='utf-8') as f:
+    with open(timestr + '_cians_' + user + '.csv', 'w', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow((data['name'], data['urls_info_block'],  data['url'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user']))
 

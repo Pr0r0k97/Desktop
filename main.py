@@ -7,6 +7,7 @@ import DomoFond
 import re
 import logging
 import time
+import tg_analytic
 
 bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 
@@ -15,6 +16,9 @@ bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
 # Logger
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
+
+
+
 
 
 @bot.message_handler(commands=['start'])
@@ -43,8 +47,18 @@ def callback_worker(message):
             qe = bot.send_message(message.chat.id, 'Введите ссылку DomClick')
             if qe:
                 bot.register_next_step_handler(qe, callback_workers_DomClick)
+        elif message.text[:10] == 'статистика' or message.text[:10] == 'Cтатистика':
+            st = message.text.split(' ')
+            if 'txt' in st or 'тхт' in st:
+                tg_analytic.analysis(st, message.chat.id)
+                with open('%s.txt' % message.chat.id, 'r', encoding='UTF-8') as file:
+                    bot.send_document(message.chat.id, file)
+                    tg_analytic.remove(message.chat.id)
+            else:
+                messages = tg_analytic.analysis(st, message.chat.id)
+                bot.send_message(message.chat.id, messages)
         else:
-            bot.send_message(message.chat.id, 'Выберете кнопку')
+            bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 
@@ -58,7 +72,7 @@ def callback_workers(message):
                 qqq = bot.send_message(message.chat.id, 'Введите номер страницы')
                 bot.register_next_step_handler(qqq, callback__two)
             else:
-                bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+                bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 def callback__two(message):
         page = message.text
@@ -70,7 +84,7 @@ def callback__two(message):
             doc = open(timestr + '_cians_' + user_first_name + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
         else:
-            bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+            bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 """_________________________Domofond_______________________________"""
@@ -83,7 +97,7 @@ def callback_workers_DomoFond(message):
                 qqq = bot.send_message(message.chat.id, 'Введите номер страницы Домофонд')
                 bot.register_next_step_handler(qqq, callback__two_DomoFond)
             else:
-                bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+                bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 
@@ -93,11 +107,11 @@ def callback__two_DomoFond(message):
                 lists_DomoFond.append(page)
                 user_first_name = str(message.chat.first_name)
                 DomoFond.Parsing(ade=lists_DomoFond[0], pages=lists_DomoFond[1], user=user_first_name)
-                # timestr = strftime("%Y.%m.%d")
-                # doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
-                # bot.send_document(message.chat.id, doc)
+                timestr = strftime("%Y.%m.%d")
+                doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
+                bot.send_document(message.chat.id, doc)
             else:
-                bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+                bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 def info_DomoFond(one, two):
@@ -116,7 +130,7 @@ def callback_workers_DomClick(message):
                 qqq = bot.send_message(message.chat.id, 'Введите номер страницы Домклик')
                 bot.register_next_step_handler(qqq, callback__two_DomClick)
             else:
-                bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+                bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 def callback__two_DomClick(message):
         page = message.text
@@ -129,7 +143,7 @@ def callback__two_DomClick(message):
             doc = open(timestr + '_DomClick' + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
         else:
-            bot.send_message(message.chat.id, 'Введите \start и начните все сначало')
+            bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 def info_DomClick(one, two):
@@ -138,7 +152,7 @@ def info_DomClick(one, two):
 
 @bot.message_handler(content_types=['text'])
 def callback__two_Start(message):
-        bot.send_message(message.chat.id, 'Нажмите старт заново')
+        bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
         start
 
 if __name__ == '__main__':
