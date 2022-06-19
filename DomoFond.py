@@ -9,7 +9,8 @@ import csv
 import main
 
 class Parsing():
-    def __init__(self, ade, pages, user):
+    def __init__(self, ade, pages, user, id):
+        self.id = id
         self.link = str(ade)
         self.page = int(pages)
         self.user = user
@@ -27,7 +28,7 @@ class Parsing():
             count += 1
             sleep(0.2)
         print(f'Выполняется парсинг {i} страниц из {self.page -1}')
-        main.info_DomoFond(one=i, two=self.page)
+        main.info_DomoFond(one=i, two=self.page, id=self.id)
         options = webdriver.FirefoxOptions()
         #options.add_argument('--headless')
         p = os.path.abspath('geckodriver.exe')

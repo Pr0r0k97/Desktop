@@ -10,12 +10,13 @@ import time
 import main
 
 class Parsing_Domclick():
-    def __init__(self, ade, pages, user):
+    def __init__(self, ade, pages, user, id):
+        self.id = id
         self.link = str(ade)
         self.page = int(pages)
         self.user = user
         text = re.sub(r'page=\d+', 'page={}', self.link)
-        urls = [text.format(str(i)) for i in range(self.page)]
+        urls = [text.format(str(i)) for i in range(1, self.page)]
 
         with Pool(3) as p:
             p.map(self.get_page_data, urls)
@@ -33,8 +34,8 @@ class Parsing_Domclick():
         for i in url:
             sleep(0.1)
             count += 1
-        print(f'Выполняется парсинг {count} страниц из {self.page}')
-        main.info_DomClick(one=i, two=self.page)
+        print(f'Выполняется парсинг {i} страниц из {self.page}')
+        main.info_DomClick(one=i, two=self.page - 1, id=self.id)
         options = webdriver.ChromeOptions()
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)

@@ -116,10 +116,11 @@ def callback_workers_DomoFond(message):
 
 def callback__two_DomoFond(message):
             page = message.text
+            id = message.chat.id
             if re.search('\d+', page):
                 lists_DomoFond.append(page)
                 user_first_name = str(message.chat.first_name)
-                DomoFond.Parsing(ade=lists_DomoFond[0], pages=lists_DomoFond[1], user=user_first_name)
+                DomoFond.Parsing(ade=lists_DomoFond[0], pages=lists_DomoFond[1], user=user_first_name, id=id)
                 timestr = strftime("%Y.%m.%d")
                 doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
                 bot.send_document(message.chat.id, doc)
@@ -131,8 +132,8 @@ def callback__two_DomoFond(message):
 
 
 
-def info_DomoFond(one, two):
-        bot.send_message(chat_id='5161500526', text=f'DomoFond: Выполняется парсинг {one} страниц из {two -1}')
+def info_DomoFond(one, two, id):
+        bot.send_message(chat_id=id, text=f'DomoFond: Выполняется парсинг {one} страниц из {two -1}')
 
 
 
@@ -151,11 +152,11 @@ def callback_workers_DomClick(message):
 
 def callback__two_DomClick(message):
         page = message.text
-        print(page)
+        id = message.chat.id
         if re.search('\d+', page):
             lists_DomClick.append(page)
             user_first_name = str(message.chat.first_name)
-            DomClik.Parsing_Domclick(ade=lists_DomClick[0], pages=lists_DomClick[1], user=user_first_name)
+            DomClik.Parsing_Domclick(ade=lists_DomClick[0], pages=lists_DomClick[1], user=user_first_name, id=id)
             timestr = strftime("%Y.%m.%d")
             doc = open(timestr + '_DomClick' + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
@@ -165,8 +166,8 @@ def callback__two_DomClick(message):
             bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
-def info_DomClick(one, two):
-    bot.send_message(chat_id='5161500526', text=f'DomClick: Выполняется парсинг {one} страниц из {two -1}')
+def info_DomClick(one, two, id):
+    bot.send_message(chat_id=id, text=f'DomClick: Выполняется парсинг {one} страниц из {two }')
 
 
 @bot.message_handler(content_types=['text'])
