@@ -1,4 +1,3 @@
-import pandas as pd
 from selenium import webdriver
 from time import sleep, strftime
 from selenium.webdriver.common.by import By
@@ -8,9 +7,7 @@ from multiprocessing import Pool
 import re
 import csv
 import main
-import openpyxl as xl
-from openpyxl import Workbook
-import pandas
+
 class Parsing():
     def __init__(self, ade, pages, user):
         self.link = str(ade)
@@ -28,10 +25,11 @@ class Parsing():
         count = 0
         for i in url:
             count += 1
-        print(f'Выполняется парсинг {i} страниц из {self.page}')
+            sleep(0.2)
+        print(f'Выполняется парсинг {i} страниц из {self.page -1}')
         main.info_DomoFond(one=i, two=self.page)
         options = webdriver.FirefoxOptions()
-        # options.add_argument('--headless')
+        #options.add_argument('--headless')
         p = os.path.abspath('geckodriver.exe')
         driver = webdriver.Firefox(options=options, executable_path=p)
         driver.get(url=url)
@@ -45,6 +43,10 @@ class Parsing():
         ads = soup.find('div', class_='search-results__itemCardList___RdWje').find_all('a', class_='long-item-card__item___ubItG')
         for ad in ads:
             urls = 'https://www.domofond.ru' + ad.get('href')
+            try:
+                data_dobavlenia = ad.find('div', class_='long-item-card__informationFooterRight___3Xw4i').text
+            except:
+                data_dobavlenia = ''
             driver.get(urls)
             sleep(2)
             try:
@@ -79,10 +81,7 @@ class Parsing():
                 numbers = soups.find('a', class_='show-number-button__link___lB7O7').text
             except:
                 numbers = ''
-            try:
-                categor = soups.find('div', class_='detail-information__wrapper___FRRqm').text
-            except:
-                categor = ''
+
             data = {
                 'dates': dates,
                 'name': name,
@@ -90,28 +89,19 @@ class Parsing():
                 'hous_kompleks': hous_kompleks,
                 'addres': addres,
                 'metro': metro,
-                'numbers': numbers
+                'numbers': numbers,
+                'data_dobavlenia': data_dobavlenia
             }
-            # data = pd.DataFrame({
-            #     'dates': [dates],
-            #     'name': [name],
-            #     'price': [price],
-            #     'hous_kompleks': [hous_kompleks],
-            #     'addres': [addres],
-            #     'metro': [metro],
-            #     'numbers': [numbers]
-            #
-            # })
             print(data)
             self.write_csv(data)
 
         # Сохранение в csv фаил
     def write_csv(self, data):
         timestr = strftime("%Y.%m.%d")
-        with open(timestr + '_Domofond_' + self.user + '.xlsx', 'w', encoding='utf-8') as f:
+        with open(timestr + '_Domofond_' + self.user + '.csv', 'a', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'], data['metro'], data['numbers']))
-        #Edata.to_excel(timestr + '_DomoFond.xlsx', 'w')
+            writer.writerow((data['name'], data['dates'], data['price'], data['hous_kompleks'], data['addres'], data['metro'], data['numbers'], data['data_dobavlenia'], data['categor']))
+
 
 
     def end_func(self, response):

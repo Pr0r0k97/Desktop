@@ -1,10 +1,16 @@
+import os.path
 import requests
+import xlsxwriter
 from bs4 import BeautifulSoup
 import csv
 from multiprocessing import Pool
 import re
 import time
 from fake_useragent import UserAgent
+from main import info_Cian
+import xlsxwriter
+import pandas
+
 
 ua = UserAgent()
 
@@ -39,10 +45,8 @@ def get_html(url, retry=5):
     try:
         r = requests.get(url, headers=headers)
         #print(f"[+]  {url} {r.status_code}")
-        count = 0
-        for i in url:
-            count += 1
         print(f'Выполняется парсинг данной страницы {url}')
+        info_Cian(one=url)
     except Exception as ex:
         time.sleep(5)
         if retry:
@@ -60,6 +64,13 @@ def write_csv(data, user):
     with open(timestr + '_cians_' + user + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow((data['name'], data['urls_info_block'], data['views'], data['data_dobavlenia'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user'], data['url']))
+    # xlsx_path = os.path.dirname(__file__) + r"\test.xlsx"
+    # with pandas.ExcelWriter(timestr + '_cians_' + user + '.xlsx',mode="a" if os.path.exists(timestr + '_cians_' + user + '.xlsx') else "w") as wb:
+    #     data.to_excel(wb, sheet_name='Summary', index=False)
+
+
+
+
 
 
 
@@ -158,6 +169,20 @@ def get_page_data(html, user):
                 'data_dobavlenia': data_dobavlenia,
                 'id_user': id_user
                 }
+        # data = pandas.DataFrame({
+        #         'name': [name],
+        #         'url': [urls],
+        #         'addres': [addres],
+        #         'price': [price],
+        #         'metro': [metro],
+        #         'istoc': [istoc],
+        #         'peshkom': [peshkom],
+        #         'kvadrat_metr': [kvadrat_metr],
+        #         'urls_info_block': [urls_info_block],
+        #         'views': [views],
+        #         'data_dobavlenia': [data_dobavlenia],
+        #         'id_user': [id_user]
+        #         })
         print(data)
         write_csv(data, user)
 

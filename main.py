@@ -11,13 +11,17 @@ import tg_analytic
 import os
 
 
-bot = telebot.TeleBot('5324509616:AAE4_hmcPm3U_q4z-Am_VRsniQ_VF8XnAOo')
+
+bot = telebot.TeleBot('5582241891:AAGqYgrgB1dmjPpsQftQ7nvPQMoL2B3rOCk')
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 
 # Logger
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
+
+
+
 
 
 @bot.message_handler(commands=['start'])
@@ -28,9 +32,11 @@ def start(message):
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(start_button, start_button_2, start_button_3)
         user_first_name = str(message.chat.first_name)
-        sent = bot.send_message(message.chat.id, f'Добро пожаловать {user_first_name} 🔥\nВас приветствует бот Parsing_money\nВыберите кнопку сайта данные которого вы хотите спарсить',  reply_markup=keyboard)
+        sent = bot.send_message(message.chat.id, f'Добро пожаловать {user_first_name} 🔥\nВас приветствует BotParserNedvizhimost\nВыберите кнопку сайта данные которого вы хотите спарсить',  reply_markup=keyboard)
+        #bot.send_message(message.chat.id, f'Инструкция о том как работает наш бот:')
+        # video = open('/tmp/video.mp4', 'rb')
+        # bot.send_video(message.chat.id, video)
         bot.register_next_step_handler(sent, callback_worker)
-
 
 
 def callback_worker(message):
@@ -80,15 +86,21 @@ def callback__two(message):
             user_first_name = str(message.chat.first_name)
             Cian_2.main(ade=lists[0], pages=lists[1], user=user_first_name)
             timestr = strftime("%Y.%m.%d")
-            doc = open(timestr + '_cians_' + user_first_name + '.csv', 'rb')
+            doc = open(timestr + '_cians_' + user_first_name + '.xlsx', 'rb')
             bot.send_document(message.chat.id, doc)
             time.sleep(5)
-            p = os.path.abspath(timestr + '_cians_' + user_first_name + '.csv')
-            os.remove(p + timestr + '_cians_' + user_first_name + '.csv')
+            open(timestr + '_cians_' + user_first_name + '.xlsx', 'w').close()
 
         else:
             bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
+def info_Cian(one):
+
+    bot.send_message(test.chat.id, 'asfasf')
+
+
+
+    #bot.send_message(chat_id=one, text=f'Cian: Выполняется парсинг данной страницы {one}')
 
 """_________________________Domofond_______________________________"""
 
@@ -113,12 +125,17 @@ def callback__two_DomoFond(message):
                 timestr = strftime("%Y.%m.%d")
                 doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
                 bot.send_document(message.chat.id, doc)
+                time.sleep(5)
+                open(timestr + '_Domofond_' + user_first_name + '.csv', 'w').close()
             else:
                 bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
+@bot.message_handler()
+def info_DomoFond(tr):
+    print(tr)
 
 def info_DomoFond(one, two):
-        bot.send_message(chat_id='5161500526', text=f'DomoFond: Выполняется парсинг {one} страниц из {two}')
+        bot.send_message(chat_id='5161500526', text=f'DomoFond: Выполняется парсинг {one} страниц из {two -1}')
 
 
 
@@ -145,12 +162,14 @@ def callback__two_DomClick(message):
             timestr = strftime("%Y.%m.%d")
             doc = open(timestr + '_DomClick' + '.csv', 'rb')
             bot.send_document(message.chat.id, doc)
+            time.sleep(5)
+            open(timestr + '_DomClick' + '.csv', 'w').close()
         else:
             bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
 
 def info_DomClick(one, two):
-    bot.send_message(chat_id='5161500526', text=f'DomClick: Выполняется парсинг {one} страниц из {two}')
+    bot.send_message(chat_id='5161500526', text=f'DomClick: Выполняется парсинг {one} страниц из {two -1}')
 
 
 @bot.message_handler(content_types=['text'])
