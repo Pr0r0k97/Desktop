@@ -41,12 +41,12 @@ def retrys(func, retries=5):
 
 # Делаем запрос к странице
 @retrys
-def get_html(url, retry=5):
+def get_html(url, id, retry=5, ):
     try:
         r = requests.get(url, headers=headers)
         #print(f"[+]  {url} {r.status_code}")
-        print(f'Выполняется парсинг данной страницы {url}')
-        info_Cian(one=url)
+        #print(f'Выполняется парсинг данной страницы {url}')
+        info_Cian(one=url, id=id)
     except Exception as ex:
         time.sleep(5)
         if retry:
@@ -190,14 +190,14 @@ def end_func(response):
     print("Задание завершено")
 
 
-def make_all(url, user):
+def make_all(url, user, id):
     for i in url:
-        html = get_html(i)
+        html = get_html(i, id)
     print(i)
     get_page_data(html, user)
 
 
-def main(ade, pages, user):
+def main(ade, pages, user, id):
     urlst = str(ade)
     page = int(pages)
     text = re.sub(r'p=\d+', 'p={}', urlst)
@@ -205,7 +205,7 @@ def main(ade, pages, user):
 
     # Подключаем мультипроцессинг
     with Pool(4) as p:
-        p.apply_async(make_all, args=(urls, user), callback=end_func)
+        p.apply_async(make_all, args=(urls, user, id), callback=end_func)
         p.close()
         p.join()
 

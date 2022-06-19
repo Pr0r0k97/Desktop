@@ -81,10 +81,11 @@ def callback_workers(message):
 
 def callback__two(message):
         page = message.text
+        qwe = message.chat.id
         if re.search('\d+', page):
             lists.append(page)
             user_first_name = str(message.chat.first_name)
-            Cian_2.main(ade=lists[0], pages=lists[1], user=user_first_name)
+            Cian_2.main(ade=lists[0], pages=lists[1], user=user_first_name, id=qwe)
             timestr = strftime("%Y.%m.%d")
             doc = open(timestr + '_cians_' + user_first_name + '.xlsx', 'rb')
             bot.send_document(message.chat.id, doc)
@@ -94,13 +95,10 @@ def callback__two(message):
         else:
             bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
-def info_Cian(one):
 
-    bot.send_message(test.chat.id, 'asfasf')
-
-
-
-    #bot.send_message(chat_id=one, text=f'Cian: Выполняется парсинг данной страницы {one}')
+def info_Cian(one, id):
+    print(one)
+    bot.send_message(chat_id=id, text=f'Cian: Выполняется парсинг данной страницы {one}')
 
 """_________________________Domofond_______________________________"""
 
@@ -130,9 +128,8 @@ def callback__two_DomoFond(message):
             else:
                 bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
 
-@bot.message_handler()
-def info_DomoFond(tr):
-    print(tr)
+
+
 
 def info_DomoFond(one, two):
         bot.send_message(chat_id='5161500526', text=f'DomoFond: Выполняется парсинг {one} страниц из {two -1}')
