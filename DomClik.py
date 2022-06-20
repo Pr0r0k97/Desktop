@@ -1,13 +1,16 @@
-from time import sleep, strftime
-from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup as BS
-from multiprocessing import Pool
-import re
 import csv
-from selenium import webdriver
 import os
+import re
 import time
+from multiprocessing import Pool
+from time import sleep, strftime
+
+from bs4 import BeautifulSoup as BS
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
 import main
+
 
 class Parsing_Domclick():
     def __init__(self, ade, pages, user, id):
@@ -24,10 +27,10 @@ class Parsing_Domclick():
     # #Сохранение в csv фаил
     def write_csv(self, data):
         timestr = strftime("%Y.%m.%d")
-        with open(timestr + '_DomClick_' + self.user + '.csv', 'w', encoding='utf-8') as f:
+        with open(timestr + '_DomClick_' + self.user + '.csv', 'a', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow((data['name'], data['numbers'], data['price'], data['views'], data['data_dobavlenia'], data['metro'], data['addres'], data['kvdrat_metr'], data['name_user']))
-
+            writer.writerow((data['name'], data['numbers'], data['price'], data['views'], data['data_dobavlenia'],
+                             data['metro'], data['addres'], data['kvdrat_metr'], data['name_user']))
 
     def get_page_data(self, url):
         count = 1
@@ -43,7 +46,8 @@ class Parsing_Domclick():
         options.add_argument("--start-maximized");
         p = os.path.abspath('chromedriver.exe')
         driver = webdriver.Chrome(chrome_options=options, executable_path=p)
-        driver.get('https://nova.rambler.ru/search?utm_source=head&utm_campaign=self_promo&utm_medium=form&utm_content=search&query=domclick')
+        driver.get(
+            'https://nova.rambler.ru/search?utm_source=head&utm_campaign=self_promo&utm_medium=form&utm_content=search&query=domclick')
         time.sleep(5)
         Button_email = driver.find_element(By.LINK_TEXT, 'domclick.ru')
         Button_email.click()
@@ -71,7 +75,8 @@ class Parsing_Domclick():
             except:
                 name = ''
             try:
-                numbers = soups.find('a', class_='button-root-8-1-2 button-root--primary-8-1-2 button-root--large-8-1-2 button-root--type-link-reset-8-1-2 button-root--fluid-8-1-2').text
+                numbers = soups.find('a',
+                                     class_='button-root-8-1-2 button-root--primary-8-1-2 button-root--large-8-1-2 button-root--type-link-reset-8-1-2 button-root--fluid-8-1-2').text
             except:
                 numbers = ''
             try:
@@ -115,16 +120,3 @@ class Parsing_Domclick():
             }
             print(data)
             self.write_csv(data)
-
-
-
-
-
-
-
-
-
-
-
-
-
