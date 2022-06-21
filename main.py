@@ -1,3 +1,4 @@
+#version 1.0
 import logging
 import re
 import time
@@ -11,8 +12,7 @@ import DomClik
 import DomoFond
 import tg_analytic
 
-bot = telebot.TeleBot('5582241891:AAGqYgrgB1dmjPpsQftQ7nvPQMoL2B3rOCk')
-
+bot = telebot.TeleBot('5166594930:AAG3AGkwS4nfcZLqun9QCUUOx20NwAhfPeI')
 
 # Logger
 logger = telebot.logger
@@ -20,6 +20,32 @@ telebot.logger.setLevel(logging.INFO)
 
 
 @bot.message_handler(commands=['start'])
+def button_message(message):
+    link = 'https://t.me/BotParserNedvizhimost_News'
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard = types.KeyboardButton(text='Подтвердить')
+    markup.add(keyboard)
+    chat_id = message.chat.id
+    user_first_name = str(message.chat.first_name)
+    bot.send_message(chat_id, f'Привет {user_first_name} чтобы пользоваться ботом подпишись на канал\n{link}', reply_markup=markup)
+
+
+@bot.message_handler(content_types=['text'])
+def callback_inline(message):
+    print(message.chat.id)
+    user_first_name = str(message.chat.first_name)
+    if message.chat.type == 'private':
+        if message.text == 'Подтвердить':
+            status = ['creator', 'administrator', 'member']
+            for stat in status:
+              if stat == bot.get_chat_member(chat_id='@BotParserNedvizhimost_News', user_id=message.from_user.id).status:
+                  qwe = bot.send_message(message.chat.id, f'Доступ открыт {user_first_name}')
+                  start(qwe)
+                  break
+              else:
+                    bot.send_message(message.chat.id, 'Вы не подписались')
+
+
 def start(message):
     start_button = types.KeyboardButton(text='💰 Циан')
     start_button_2 = types.KeyboardButton(text='💵 DomoFond')
@@ -28,16 +54,16 @@ def start(message):
     keyboard.add(start_button, start_button_2, start_button_3)
     user_first_name = str(message.chat.first_name)
     sent = bot.send_message(message.chat.id,
-                            f'Добро пожаловать {user_first_name} 🔥\nТебя приветствует BotParserNedvizhimost\nИнструкция:\n1. Выбери кнопку сайта данные которого вы хотите спарсить\n2. Вставте ссылку ОБЯЗАТЕЛЬНО СО ВТОРОЙ СТРАНИЦЫ\n3. Введите количество страниц которое вы хотите спарсить!\n4. Среднее количество парсинга 1 страницы заимает 5-10 минут!',
+                            f'Добро пожаловать {user_first_name} 🔥\nТебя приветствует BotParserNedvizhimost\nИнструкция:\n1. Выбери кнопку сайта данные которого вы хотите спарсить\n2. Вставте ссылку ОБЯЗАТЕЛЬНО СО ВТОРОЙ СТРАНИЦЫ\n3. Введите количество страниц которое вы хотите спарсить!\n4. Среднее количество парсинга 1 страницы заимает 5-10 минут!\nВидеоинструкция: https://cloud.mail.ru/public/BvjL/5r5ay3Zs6',
                             reply_markup=keyboard)
-    # video = open('Bot tutorial.mp4', 'rb')
+    # video = open('Bot_tutorial.mp4', 'rb')
     # bot.send_video(message.chat.id, video)
     bot.register_next_step_handler(sent, callback_worker)
 
 
 def callback_worker(message):
     if message.text == '💰 Циан':
-        qs = bot.send_message(message.chat.id, 'Введите ссылку')
+        qs = bot.send_message(message.chat.id, 'Введите ссылку Циан')
         if qs:
             bot.register_next_step_handler(qs, callback_workers)
     elif message.text == '💵 DomoFond':
@@ -71,7 +97,7 @@ def callback_workers(message):
     f = message.text
     if 'https://' in f:
         lists.append(f)
-        qqq = bot.send_message(message.chat.id, 'Введите номер страницы')
+        qqq = bot.send_message(message.chat.id, 'Введите номер страницы Циан')
         bot.register_next_step_handler(qqq, callback__two)
     else:
         bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
@@ -87,7 +113,7 @@ def callback__two(message):
         timestr = strftime("%Y.%m.%d")
         doc = open(timestr + '_cians_' + user_first_name + '.csv', 'rb')
         bot.send_document(message.chat.id, doc)
-        time.sleep(5)
+        time.sleep(60)
         open(timestr + '_cians_' + user_first_name + '.csv', 'w').close()
 
     else:
@@ -124,7 +150,7 @@ def callback__two_DomoFond(message):
         timestr = strftime("%Y.%m.%d")
         doc = open(timestr + '_Domofond_' + user_first_name + '.csv', 'rb')
         bot.send_document(message.chat.id, doc)
-        time.sleep(5)
+        time.sleep(60)
         open(timestr + '_Domofond_' + user_first_name + '.csv', 'w').close()
     else:
         bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
@@ -160,7 +186,7 @@ def callback__two_DomClick(message):
         timestr = strftime("%Y.%m.%d")
         doc = open(timestr + '_DomClick' + '.csv', 'rb')
         bot.send_document(message.chat.id, doc)
-        time.sleep(5)
+        time.sleep(60)
         open(timestr + '_DomClick' + '.csv', 'w').close()
     else:
         bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
@@ -170,10 +196,10 @@ def info_DomClick(one, two, id):
     bot.send_message(chat_id=id, text=f'DomClick: Выполняется парсинг {one} страниц из {two}')
 
 
-# @bot.message_handler(content_types=['text'])
-# def callback__two_Start(message):
-#         bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
-#         start
+@bot.message_handler(content_types=['text'])
+def callback__two_Start(message):
+    bot.send_message(message.chat.id, 'Введите /start и начните все сначало 😉')
+
 
 if __name__ == '__main__':
     # Polling
@@ -183,4 +209,4 @@ if __name__ == '__main__':
             bot.polling(none_stop=True)
         except Exception as e:
             logger.error(e)
-            time.sleep(5)
+            time.sleep(3)
