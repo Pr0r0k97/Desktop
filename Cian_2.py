@@ -60,9 +60,7 @@ def write_csv(data, user):
     timestr = time.strftime("%Y.%m.%d")
     with open(timestr + '_cians_' + user + '.csv', 'a', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow((data['name'], data['urls_info_block'], data['views'], data['data_dobavlenia'], data['addres'],
-                         data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user'],
-                         data['url']))
+        writer.writerow((data['name'], data['urls_info_block'], data['views'], data['data_dobavlenia'], data['addres'], data['price'], data['metro'], data['istoc'], data['peshkom'], data['kvdrat'], data['id_user'], data['url']))
     # xlsx_path = os.path.dirname(__file__) + r"\test.xlsx"
     # with pandas.ExcelWriter(timestr + '_cians_' + user + '.xlsx',mode="a" if os.path.exists(timestr + '_cians_' + user + '.xlsx') else "w") as wb:
     #     data.to_excel(wb, sheet_name='Summary', index=False)
